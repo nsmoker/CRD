@@ -1,5 +1,6 @@
 import React from "react";
-import { BLACK_BISHOP_IMAGE_PATH, BLACK_KING_IMAGE_PATH, BLACK_KNIGHT_IMAGE_PATH, BLACK_PAWN_IMAGE_PATH, BLACK_QUEEN_IMAGE_PATH, BLACK_ROOK_IMAGE_PATH, WHITE_BISHOP_IMAGE_PATH, WHITE_KING_IMAGE_PATH, WHITE_KNIGHT_IMAGE_PATH, WHITE_PAWN_IMAGE_PATH, WHITE_QUEEN_IMAGE_PATH, WHITE_ROOK_IMAGE_PATH } from "../../include/constants";
+import { BLACK_BISHOP_IMAGE_PATH, BLACK_KING_IMAGE_PATH, BLACK_KNIGHT_IMAGE_PATH, BLACK_PAWN_IMAGE_PATH, BLACK_QUEEN_IMAGE_PATH, BLACK_ROOK_IMAGE_PATH, PIECE_DRAG_END_CHANNEL, PIECE_DRAG_START_CHANNEL, WHITE_BISHOP_IMAGE_PATH, WHITE_KING_IMAGE_PATH, WHITE_KNIGHT_IMAGE_PATH, WHITE_PAWN_IMAGE_PATH, WHITE_QUEEN_IMAGE_PATH, WHITE_ROOK_IMAGE_PATH } from "../../include/constants";
+import { emit } from '@tauri-apps/api/event'
 
 function fenCodeMap(code: string): string {
     switch (code) {
@@ -20,6 +21,7 @@ function fenCodeMap(code: string): string {
 }
 
 interface IProps {
+    dragging: boolean,
     fenCode: string,
     gridCol: number,
     gridRow: number
@@ -30,20 +32,32 @@ class Chesspiece extends React.Component<IProps, Record<string, never> > {
         super(props);
     }
 
-    render() {
-        console.log("code: " + this.props.fenCode);
-        console.log("row: " + this.props.gridRow);
-        console.log("col: " + this.props.gridCol);
+    onDragStart = () => {
+        emit(PIECE_DRAG_START_CHANNEL, {
+            sourceRow: this.props.gridRow,
+            sourceCol: this.props.gridCol,
+        });
+    }
 
-        return <img style={{
+    getStyle = (dragging: boolean) => {
+        return {
             gridColumnStart: this.props.gridCol + 1,
             gridColumnEnd: this.props.gridCol + 2,
             gridRowStart: this.props.gridRow + 1,
             gridRowEnd: this.props.gridRow + 2,
             zIndex: 1,
-            width: '100%',
-            height: '100%'
-        }} src={ fenCodeMap(this.props.fenCode) }/>
+            width: "100%",
+            height: "100%",
+            display: dragging ? "none" : "block"
+        }
+    }
+
+    render() {
+        return <img 
+            style={ this.getStyle(this.props.dragging) } 
+            src={ fenCodeMap(this.props.fenCode) }
+            onDragStart={ this.onDragStart }
+            draggable/>
     }
 }
 

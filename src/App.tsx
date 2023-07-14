@@ -2,8 +2,8 @@ import React from "react";
 import "./App.css";
 import Chessboard from "./Components/Chessboard/Chessboard";
 import { Grid } from "@mui/material";
+import { STARTING_POSITION_FEN } from "./include/constants";
 
-const startingPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
 class App extends React.Component {
   constructor(props: Record<string, never>) {
@@ -14,7 +14,7 @@ class App extends React.Component {
     return (
       <Grid container spacing={2} className="main-container">
         <Grid item xs={6} className="editor-grid-item">
-          <Chessboard fen={startingPosition}/>
+          <Chessboard fen={ STARTING_POSITION_FEN }/>
         </Grid>
       </Grid>
     );

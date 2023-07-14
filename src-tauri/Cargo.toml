@@ -10,14 +10,16 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
+prost-build = "0.11.9"
 tauri-build = { version = "1.4", features = [] }
 
 [dependencies]
 tauri = { version = "1.4", features = ["shell-open"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-prost = "0.11"
-prost-types = "0.11"
+prost = "0.11.9"
+prost-types = "0.11.9"
+bytes = "1.4.0"
 
 [target.'cfg(windows)'.dependencies]
 uds_windows = "1.0.2"

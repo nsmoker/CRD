@@ -11,3 +11,10 @@ export const WHITE_QUEEN_IMAGE_PATH = "src/assets/Chess_qlt45.svg";
 export const BLACK_QUEEN_IMAGE_PATH = "src/assets/Chess_qdt45.svg";
 export const WHITE_KING_IMAGE_PATH = "src/assets/Chess_klt45.svg";
 export const BLACK_KING_IMAGE_PATH = "src/assets/Chess_kdt45.svg";
+
+export const STARTING_POSITION_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+
+export const PIECE_DRAG_START_CHANNEL = 'piece-drag-start';
+export const PIECE_DRAG_END_CHANNEL = 'piece-drag-end';
+
+export const CHECK_LEGAL_COMMAND = 'check_legal';

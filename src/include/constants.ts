@@ -14,7 +14,9 @@ export const BLACK_KING_IMAGE_PATH = "src/assets/Chess_kdt45.svg";
 
 export const STARTING_POSITION_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
-export const PIECE_DRAG_START_CHANNEL = 'piece-drag-start';
-export const PIECE_DRAG_END_CHANNEL = 'piece-drag-end';
+export const PIECE_DRAG_START_CHANNEL = "piece-drag-start";
+export const PIECE_DRAG_END_CHANNEL = "piece-drag-end";
 
-export const CHECK_LEGAL_COMMAND = 'check_legal';
+export const PGN_DISPLAY_CHANNEL = "pgn_emit";
+
+export const CHECK_LEGAL_COMMAND = "check_legal";

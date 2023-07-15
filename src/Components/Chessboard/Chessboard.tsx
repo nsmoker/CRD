@@ -11,10 +11,10 @@ interface IState {
     dragFromCol: number | null,
     dragFromRow: number | null,
     unlisteners: UnlistenFn[],
-    fen: string
 }
 
 interface IProps {
+    moveCallback: (fen: string) => void,
     fen: string
 }
 
@@ -26,7 +26,6 @@ class Chessboard extends React.Component<IProps, IState> {
             dragFromCol: null,
             dragFromRow: null,
             unlisteners: [],
-            fen: props.fen
         }
     }
 
@@ -96,9 +95,10 @@ class Chessboard extends React.Component<IProps, IState> {
             console.log("clientX: " + event.clientX);
             console.log("clientY: " + event.clientY);
 
-            invoke<CheckLegalCommandResponse>(CHECK_LEGAL_COMMAND, makeCheckLegalRequest(srcCol, srcRow, dstCol, dstRow, this.state.fen))
+            invoke<CheckLegalCommandResponse>(CHECK_LEGAL_COMMAND, makeCheckLegalRequest(srcCol, srcRow, dstCol, dstRow, this.props.fen))
                 .then(response => {
-                    this.setState( {dragFromCol: null, fen: response.fen, dragFromRow: null } );
+                    this.props.moveCallback(response.fen)
+                    this.setState( {dragFromCol: null, dragFromRow: null } );
                 });
 
         }
@@ -111,7 +111,7 @@ class Chessboard extends React.Component<IProps, IState> {
                     src={ BOARD_IMAGE_PATH }
                     className="main-board-image" />
                 <div className="piece-container" onDrop={ this.onDrop } onDragOver={ this.muteEvent } onDragEnter={ this.muteEvent }>
-                    { this.fenStringPiecesMap(this.state.fen) }
+                    { this.fenStringPiecesMap(this.props.fen) }
                 </div>
             </div>
         );

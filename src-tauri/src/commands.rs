@@ -3,9 +3,9 @@ use std::{os::unix::net::UnixStream, io::{Write, Read, Cursor}};
 
 use prost::Message;
 
-use crate::constants::SOCKET_LOCATION;
+use crate::constants::{CHECK_LEGAL_SOCKET_LOCATION, PARSE_PGN_SOCKET_LOCATION};
 
-use self::position::{MoveInPosition, MoveMessage, Coordinate, Position, MoveLegal};
+use self::position::{MoveInPosition, MoveMessage, Coordinate, Position, MoveLegal, RequestPgnParse, PgnDisplay};
 
 pub mod position {
     include!(concat!(env!("OUT_DIR"), "/gochess.rs"));
@@ -58,8 +58,8 @@ fn deserialize_legality_request(buf: &Vec<u8>) -> MoveLegal {
     return MoveLegal::decode(&mut Cursor::new(buf)).unwrap();
 }
 
-fn write_and_get_response(buf: &Vec<u8>) -> Vec<u8> {
-    let mut stream = UnixStream::connect(SOCKET_LOCATION).unwrap();
+fn write_and_get_response(buf: &Vec<u8>, socket_address: &str) -> Vec<u8> {
+    let mut stream = UnixStream::connect(socket_address).unwrap();
     stream.write_all(&buf).unwrap();
     let mut response = Vec::new();
     stream.read_to_end(&mut response).unwrap();
@@ -70,7 +70,7 @@ fn write_and_get_response(buf: &Vec<u8>) -> Vec<u8> {
 pub fn check_legal(fen: &str, src_col: i32, src_row: i32, dst_col: i32, dst_row: i32) -> CheckLegalResponse {
     let request = create_legality_request(fen, src_col, src_row, dst_col, dst_row);
     let buffer = serialize_legality_request(&request);
-    let response = write_and_get_response(&buffer);
+    let response = write_and_get_response(&buffer, CHECK_LEGAL_SOCKET_LOCATION);
     let legality_response = deserialize_legality_request(&response);
 
     return CheckLegalResponse {
@@ -78,4 +78,28 @@ pub fn check_legal(fen: &str, src_col: i32, src_row: i32, dst_col: i32, dst_row:
         pretty_move: legality_response.pretty_move,
         legal: legality_response.legal
     };
+}
+
+pub fn create_parse_pgn_request(pgn: &str) -> RequestPgnParse {
+    let mut request = RequestPgnParse::default();
+    request.pgn = pgn.to_owned();
+    return request;
+}
+
+pub fn serialize_pgn_request(request: RequestPgnParse) -> Vec<u8> {
+    let mut buf = Vec::new();
+    buf.reserve(request.encoded_len());
+    request.encode(&mut buf).unwrap();
+    return buf;
+}
+
+fn deserialize_pgn_display(buf: &Vec<u8>) -> PgnDisplay {
+    return PgnDisplay::decode(&mut Cursor::new(buf)).unwrap();
+}
+
+pub fn parse_pgn_for_display(pgn: &str) -> PgnDisplay {
+    let request = create_parse_pgn_request(pgn);
+    let ser = serialize_pgn_request(request);
+    let response = write_and_get_response(&ser, PARSE_PGN_SOCKET_LOCATION);
+    return deserialize_pgn_display(&response);
 }

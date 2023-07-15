@@ -88,8 +88,13 @@ class Chessboard extends React.Component<IProps, IState> {
             const srcCol = 7 - this.state.dragFromCol;
             const colWidth = event.currentTarget.getBoundingClientRect().width / 8.0;
             const rowHeight = event.currentTarget.getBoundingClientRect().height / 8.0;
-            const dstCol = 7 - Math.floor(event.clientX / colWidth);
-            const dstRow = 7 - Math.floor(event.clientY / rowHeight);
+            const startX = event.currentTarget.getBoundingClientRect().left;
+            const startY = event.currentTarget.getBoundingClientRect().top;
+            const dstCol = 7 - Math.floor((event.clientX - startX) / colWidth);
+            const dstRow = 7 - Math.floor((event.clientY - startY) / rowHeight);
+
+            console.log("clientX: " + event.clientX);
+            console.log("clientY: " + event.clientY);
 
             invoke<CheckLegalCommandResponse>(CHECK_LEGAL_COMMAND, makeCheckLegalRequest(srcCol, srcRow, dstCol, dstRow, this.state.fen))
                 .then(response => {

@@ -69,7 +69,6 @@ fn write_and_get_response(buf: &Vec<u8>) -> Vec<u8> {
 #[tauri::command]
 pub fn check_legal(fen: &str, src_col: i32, src_row: i32, dst_col: i32, dst_row: i32) -> CheckLegalResponse {
     let request = create_legality_request(fen, src_col, src_row, dst_col, dst_row);
-    println!("src_col {} src_row {} dst_col {} dst_row {}", src_col, src_row, dst_col, dst_row);
     let buffer = serialize_legality_request(&request);
     let response = write_and_get_response(&buffer);
     let legality_response = deserialize_legality_request(&response);

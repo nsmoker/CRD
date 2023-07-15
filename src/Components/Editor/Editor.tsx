@@ -5,6 +5,7 @@ import Chessboard from "../Chessboard/Chessboard";
 
 import { UnlistenFn, listen, Event } from "@tauri-apps/api/event"
 import { Grid } from "@mui/material";
+import MovelistDisplay from "../MovelistDisplay/MovelistDisplay";
 
 interface IState {
     unlisteners: UnlistenFn[]
@@ -18,6 +19,7 @@ class Editor extends React.Component<Record<string, never>, IState> {
 
         const dpl = {
             fen: STARTING_POSITION_FEN,
+            algebraic: "",
             comment: "",
             prev: null,
             next: []
@@ -32,25 +34,29 @@ class Editor extends React.Component<Record<string, never>, IState> {
 
     componentDidMount(): void {
         listen<MoveDisplayList>(PGN_DISPLAY_CHANNEL, this.handleNewDisplayList)
-            .then(unlisten => this.setState({ unlisteners: this.state.unlisteners.concat(unlisten) }))
+            .then(unlisten => this.setState( { unlisteners: this.state.unlisteners.concat(unlisten) } ))
     }
 
     handleNewDisplayList = (newLst: Event<MoveDisplayList>) => {
-        console.log(newLst.payload.fen);
         finishLinking(newLst.payload)
-        this.setState({ rootDisplayList: newLst.payload, displayList: newLst.payload });
+        this.setState( { rootDisplayList: newLst.payload, displayList: newLst.payload } );
     }
 
-    moveCallback = (fen: string) => {
+    moveCallback = (fen: string, algebraic: string) => {
         const newMdl = {
             fen: fen,
+            algebraic: algebraic,
             comment: "",
             prev: this.state.displayList,
             next: []
         }
         // 07/14/2023 This is bad practice, but until there's a better way that doesn't require migrating to so-called """"functional"""" components this is what we're doing.
         this.state.displayList.next = this.state.displayList.next.concat(newMdl);
-        this.setState({ displayList: newMdl });
+        this.setState( { displayList: newMdl } );
+    }
+
+    moveSelectionCallback = (move: MoveDisplayList) => () => {
+        this.setState( { displayList: move } );
     }
 
     keypressCallback = (event: React.KeyboardEvent) => {
@@ -66,11 +72,14 @@ class Editor extends React.Component<Record<string, never>, IState> {
         this.state.unlisteners.forEach(f => f());
     }
 
-    render() {
+    render(): React.ReactNode {
         return (
             <Grid container className="editor-grid">
-                <Grid item xs={8} onKeyDown={this.keypressCallback} tabIndex={-1}>
-                    <Chessboard fen={this.state.displayList.fen} moveCallback={this.moveCallback} />
+                <Grid item xs={8} onKeyDown={ this.keypressCallback } tabIndex={-1}>
+                    <Chessboard fen={ this.state.displayList.fen } moveCallback={ this.moveCallback } />
+                </Grid>
+                <Grid item xs={4}>
+                    <MovelistDisplay displayList={ this.state.rootDisplayList } activeMove={ this.state.displayList } moveSelectionCallback={ this.moveSelectionCallback }/>
                 </Grid>
             </Grid>
         );

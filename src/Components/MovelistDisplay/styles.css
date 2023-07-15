@@ -1,0 +1,10 @@
+.movelist-display-container {
+    width: 100%;
+}
+
+.movelist-display {
+    display: flex;
+    width: 100%;
+    flex-wrap: wrap;
+    flex-direction: row;
+}

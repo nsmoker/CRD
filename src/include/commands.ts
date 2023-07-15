@@ -1,6 +1,6 @@
 export interface CheckLegalCommandResponse {
     fen: string,
-    prettyMove: string,
+    pretty_move: string,
     legal: boolean
 }
 

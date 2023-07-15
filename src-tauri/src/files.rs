@@ -8,6 +8,7 @@ use crate::{commands::parse_pgn_for_display, constants::PGN_DISPLAY_CHANNEL, com
 struct PgnDisplayInterchange {
     fen: String,
     comment: String,
+    algebraic: String,
     next: Vec<PgnDisplayInterchange>
 }
 
@@ -18,6 +19,7 @@ impl From<PgnDisplay> for PgnDisplayInterchange {
         return PgnDisplayInterchange { 
             fen: value.fen, 
             comment: value.comment, 
+            algebraic: value.algebraic,
             next:  value.next.iter().map(|x| Self::from(x.to_owned())).collect()
         }
     }

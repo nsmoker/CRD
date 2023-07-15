@@ -35,7 +35,8 @@ message RequestPgnParse {
 message PgnDisplay {
     string fen = 1;
     string comment = 2;
-    repeated PgnDisplay next = 3;
+    string algebraic = 3;
+    repeated PgnDisplay next = 4;
 }
 
 option go_package = "gochess/";

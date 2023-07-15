@@ -52,7 +52,7 @@ class Chesspiece extends React.Component<IProps, Record<string, never> > {
         }
     }
 
-    render() {
+    render(): React.ReactNode {
         return <img 
             style={ this.getStyle(this.props.dragging) } 
             src={ fenCodeMap(this.props.fenCode) }

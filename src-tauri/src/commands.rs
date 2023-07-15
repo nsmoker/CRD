@@ -73,6 +73,8 @@ pub fn check_legal(fen: &str, src_col: i32, src_row: i32, dst_col: i32, dst_row:
     let response = write_and_get_response(&buffer, CHECK_LEGAL_SOCKET_LOCATION);
     let legality_response = deserialize_legality_request(&response);
 
+    println!("{}", legality_response.pretty_move);
+
     return CheckLegalResponse {
         fen: legality_response.position.unwrap().fen,
         pretty_move: legality_response.pretty_move,

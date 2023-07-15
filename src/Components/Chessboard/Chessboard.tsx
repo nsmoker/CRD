@@ -14,7 +14,7 @@ interface IState {
 }
 
 interface IProps {
-    moveCallback: (fen: string) => void,
+    moveCallback: (fen: string, algebraic: string) => void,
     fen: string
 }
 
@@ -34,7 +34,6 @@ class Chessboard extends React.Component<IProps, IState> {
         let col = 0;
         let ret = [];
         let i = 0;
-        console.log(fen);
         while (fen.charAt(i) !== " ") {
             const code = fen.charAt(i);
             if (code !== "/" && isNaN(Number(code))) {
@@ -92,19 +91,18 @@ class Chessboard extends React.Component<IProps, IState> {
             const dstCol = 7 - Math.floor((event.clientX - startX) / colWidth);
             const dstRow = 7 - Math.floor((event.clientY - startY) / rowHeight);
 
-            console.log("clientX: " + event.clientX);
-            console.log("clientY: " + event.clientY);
-
             invoke<CheckLegalCommandResponse>(CHECK_LEGAL_COMMAND, makeCheckLegalRequest(srcCol, srcRow, dstCol, dstRow, this.props.fen))
                 .then(response => {
-                    this.props.moveCallback(response.fen)
-                    this.setState( {dragFromCol: null, dragFromRow: null } );
+                    if (response.legal) {
+                        this.props.moveCallback(response.fen, response.pretty_move)
+                    }
+                    this.setState( { dragFromCol: null, dragFromRow: null } );
                 });
 
         }
     }
 
-    render() {
+    render(): React.ReactNode {
         return (
             <div className="main-board-container">
                 <img 

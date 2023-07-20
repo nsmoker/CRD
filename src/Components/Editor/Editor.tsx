@@ -50,9 +50,14 @@ class Editor extends React.Component<Record<string, never>, IState> {
             prev: this.state.displayList,
             next: []
         }
-        // 07/14/2023 This is bad practice, but until there's a better way that doesn't require migrating to so-called """"functional"""" components this is what we're doing.
-        this.state.displayList.next = this.state.displayList.next.concat(newMdl);
-        this.setState( { displayList: newMdl } );
+        let found = this.state.displayList.next.find(x => x.fen === fen);
+        if (found != undefined) {
+            this.setState( { displayList: found });
+        } else {
+            // 07/14/2023 This is bad practice, but until there's a better way that doesn't require migrating to so-called """"functional"""" components this is what we're doing.
+            this.state.displayList.next = this.state.displayList.next.concat(newMdl);
+            this.setState( { displayList: newMdl } );
+        }
     }
 
     moveSelectionCallback = (move: MoveDisplayList) => () => {
@@ -60,7 +65,6 @@ class Editor extends React.Component<Record<string, never>, IState> {
     }
 
     keypressCallback = (event: React.KeyboardEvent) => {
-        console.log(event.key);
         if (event.key === "ArrowLeft" && this.state.displayList.prev != null) {
             this.setState( { displayList: this.state.displayList.prev } );
         } else if (event.key === "ArrowRight" && this.state.displayList.next.length > 0) {

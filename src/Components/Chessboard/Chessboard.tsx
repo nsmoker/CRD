@@ -58,8 +58,8 @@ class Chessboard extends React.Component<IProps, IState> {
     }
 
     componentDidMount() {
-        listen<PieceDragStartEvent>(PIECE_DRAG_START_CHANNEL, this.onPieceDragStartSignal).then(x => this.setState( { unlisteners: this.state.unlisteners.concat(x)}));
-        listen(PIECE_DRAG_END_CHANNEL, this.onPieceDragEndSignal).then(x => this.setState( { unlisteners: this.state.unlisteners.concat(x)}));
+        listen<PieceDragStartEvent>(PIECE_DRAG_START_CHANNEL, this.onPieceDragStartSignal).then(x => this.setState( { unlisteners: this.state.unlisteners.concat(x) } ));
+        listen(PIECE_DRAG_END_CHANNEL, this.onPieceDragEndSignal).then(x => this.setState( { unlisteners: this.state.unlisteners.concat(x) } ));
     }
 
     onPieceDragStartSignal = (event: Event<PieceDragStartEvent>) => {

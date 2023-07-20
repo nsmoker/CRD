@@ -36,11 +36,11 @@ class MovelistDisplay extends React.Component<IProps, Record<string, never> > {
 
             if (ply % 2 === 0) {
                 ret.push(
-                    <Typography key={ `${ply} ${elem.fen} ${index} lbl`}>{ (ply + 2) / 2 }. </Typography>
+                    <Typography key={ `${ply} ${elem.fen} ${elem.algebraic} ${index} lbl` }>{ (ply + 2) / 2 }. </Typography>
                 );
             } else if (index !== 0) {
                 ret.push(
-                    <Typography key={ `${ply} ${elem.fen} ${index} lbl` }>{ Math.floor((ply + 2) / 2) }... </Typography>
+                    <Typography key={ `${ply} ${elem.fen} ${elem.algebraic} ${index} lbl` }>{ Math.floor((ply + 2) / 2) }... </Typography>
                 );
             }
 
@@ -59,6 +59,13 @@ class MovelistDisplay extends React.Component<IProps, Record<string, never> > {
                 return ret;
             }
         });
+
+        if (follow.length > 0 && displayList.next.length > 1 && ply % 2 !== 0) {
+            const lst: React.ReactNode[] = [<Typography 
+                key={ `${ply} ${displayList.fen} ${displayList.algebraic} ${displayList} restore-lbl` }
+            >{ Math.floor((ply + 2.0) / 2.0) }... </Typography>];
+            follow = lst.concat(follow);
+        }
 
         return chips.concat(follow);
     }

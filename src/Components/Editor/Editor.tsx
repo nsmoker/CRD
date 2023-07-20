@@ -78,11 +78,11 @@ class Editor extends React.Component<Record<string, never>, IState> {
 
     render(): React.ReactNode {
         return (
-            <Grid container className="editor-grid">
+            <Grid container style={{width: "100%", height: "100%", maxHeight: "100%", overflow: "auto"}}>
                 <Grid item xs={8} onKeyDown={ this.keypressCallback } tabIndex={-1}>
                     <Chessboard fen={ this.state.displayList.fen } moveCallback={ this.moveCallback } />
                 </Grid>
-                <Grid item xs={4}>
+                <Grid item xs={4} style={{height: "100%", maxHeight: "100%", overflow: "auto"}}>
                     <MovelistDisplay displayList={ this.state.rootDisplayList } activeMove={ this.state.displayList } moveSelectionCallback={ this.moveSelectionCallback }/>
                 </Grid>
             </Grid>

@@ -14,7 +14,7 @@ class App extends React.Component {
   render() {
     return (
       <Grid container spacing={2} className="main-container">
-        <Grid item xs={9} className="editor-grid-item">
+        <Grid item xs={12} style={{width: "100%", height: "100%", maxHeight: "100%", overflow: "auto"}}>
           <Editor/>
         </Grid>
       </Grid>

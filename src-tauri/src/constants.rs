@@ -5,5 +5,7 @@ pub static REPERTOIRES_LOCATION: &str = "./repertoires";
 pub static PGN_IMPORT_MENU_ID: &str = "pgn_import";
 pub static ADD_REPERTOIRE_MENU_ID: &str = "rep_add";
 pub static SAVE_AS_MENU_ID: &str = "save_as";
+pub static IMPORT_COMPARE_MENU_ID: &str = "pgn_import_compare";
 
 pub static PGN_DISPLAY_CHANNEL: &str = "pgn_emit";
+pub static PGN_COMPARE_CHANNEL: &str = "pgn_compare";

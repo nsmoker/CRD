@@ -8,7 +8,7 @@ mod files;
 
 use std::fs::{self};
 
-use constants::{PGN_IMPORT_MENU_ID, ADD_REPERTOIRE_MENU_ID, REPERTOIRES_LOCATION, SAVE_AS_MENU_ID};
+use constants::{PGN_IMPORT_MENU_ID, ADD_REPERTOIRE_MENU_ID, REPERTOIRES_LOCATION, SAVE_AS_MENU_ID, IMPORT_COMPARE_MENU_ID};
 use tauri::{Menu, CustomMenuItem, Submenu, api::dialog::FileDialogBuilder,};
 #[cfg(target_os = "windows")]
 use uds_windows::UnixStream;
@@ -28,6 +28,7 @@ fn main() {
         .add_item(CustomMenuItem::new(PGN_IMPORT_MENU_ID, "Import PGN file"))
         .add_item(CustomMenuItem::new(ADD_REPERTOIRE_MENU_ID, "Add Repertoire"))
         .add_item(CustomMenuItem::new(SAVE_AS_MENU_ID, "Save as..."))
+        .add_item(CustomMenuItem::new(IMPORT_COMPARE_MENU_ID, "Import and Compare"))
         .add_submenu(rep_load_submenu));
     let menu = Menu::new()
         .add_submenu(file_submenu);
@@ -51,8 +52,12 @@ fn main() {
                     FileDialogBuilder::new()
                         .add_filter("PGN Files", &["pgn"])
                         .save_file(move |file| {
-                            files::handle_save_pgn(event.window(), file);
                         });
+                },
+                x if x == IMPORT_COMPARE_MENU_ID => {
+                    FileDialogBuilder::new()
+                        .add_filter("PGN Files", &["pgn"])
+                        .pick_file(move |picked| files::handle_import_compare(event.window(), picked));
                 },
                 x => {
                     if let Ok(mut dir) = fs::read_dir(REPERTOIRES_LOCATION) {

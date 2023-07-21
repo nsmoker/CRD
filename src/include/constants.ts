@@ -18,5 +18,6 @@ export const PIECE_DRAG_START_CHANNEL = "piece-drag-start";
 export const PIECE_DRAG_END_CHANNEL = "piece-drag-end";
 
 export const PGN_DISPLAY_CHANNEL = "pgn_emit";
+export const PGN_COMPARE_CHANNEL = "pgn_compare";
 
 export const CHECK_LEGAL_COMMAND = "check_legal";

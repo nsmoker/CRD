@@ -1,16 +1,18 @@
 import React from "react";
-import { MoveDisplayList, finishLinking } from "../../include/displaytypes";
-import { PGN_DISPLAY_CHANNEL, STARTING_POSITION_FEN } from "../../include/constants";
+import { MoveDisplayList, TreeDiff, finishLinking } from "../../include/displaytypes";
+import { PGN_COMPARE_CHANNEL, PGN_DISPLAY_CHANNEL, STARTING_POSITION_FEN } from "../../include/constants";
 import Chessboard from "../Chessboard/Chessboard";
 
 import { UnlistenFn, listen, Event } from "@tauri-apps/api/event"
-import { Grid } from "@mui/material";
+import { Grid, ListItem, Typography } from "@mui/material";
 import MovelistDisplay from "../MovelistDisplay/MovelistDisplay";
+import DiffDisplay from "../DiffDisplay/DiffDisplay";
 
 interface IState {
     unlisteners: UnlistenFn[]
     rootDisplayList: MoveDisplayList
     displayList: MoveDisplayList
+    diffs: [MoveDisplayList, MoveDisplayList][]
 }
 
 class Editor extends React.Component<Record<string, never>, IState> {
@@ -28,13 +30,22 @@ class Editor extends React.Component<Record<string, never>, IState> {
         this.state = {
             displayList: dpl,
             rootDisplayList: dpl,
-            unlisteners: []
+            unlisteners: [],
+            diffs: []
         }
     }
 
     componentDidMount(): void {
         listen<MoveDisplayList>(PGN_DISPLAY_CHANNEL, this.handleNewDisplayList)
-            .then(unlisten => this.setState( { unlisteners: this.state.unlisteners.concat(unlisten) } ))
+            .then(unlisten => this.setState( { unlisteners: this.state.unlisteners.concat(unlisten) } ));
+        listen<TreeDiff>(PGN_COMPARE_CHANNEL, this.handleCompare)
+            .then(unlisten => this.setState( { unlisteners: this.state.unlisteners.concat(unlisten) } ));
+    }
+
+    handleCompare = (event: Event<TreeDiff>) => {
+        console.log(event.payload)
+        finishLinking(event.payload.display_list);
+        this.setState( { rootDisplayList: event.payload.display_list, displayList: event.payload.display_list, diffs: event.payload.diffs } );
     }
 
     handleNewDisplayList = (newLst: Event<MoveDisplayList>) => {
@@ -54,7 +65,7 @@ class Editor extends React.Component<Record<string, never>, IState> {
         if (found != undefined) {
             this.setState( { displayList: found });
         } else {
-            // 07/14/2023 This is bad practice, but until there's a better way that doesn't require migrating to so-called """"functional"""" components this is what we're doing.
+            // 07/14/2023 This is bad practice, but until there's a better way that doesn't require migrating to so-called functional components this is what we're doing.
             this.state.displayList.next = this.state.displayList.next.concat(newMdl);
             this.setState( { displayList: newMdl } );
         }
@@ -79,11 +90,16 @@ class Editor extends React.Component<Record<string, never>, IState> {
     render(): React.ReactNode {
         return (
             <Grid container style={{width: "100%", height: "100%", maxHeight: "100%", overflow: "auto"}}>
-                <Grid item xs={8} onKeyDown={ this.keypressCallback } tabIndex={-1}>
+                <Grid item xs={6} onKeyDown={ this.keypressCallback } tabIndex={-1}>
                     <Chessboard fen={ this.state.displayList.fen } moveCallback={ this.moveCallback } />
                 </Grid>
-                <Grid item xs={4} style={{height: "100%", maxHeight: "100%", overflow: "auto"}}>
+                <Grid item xs={true} style={{height: "100%", maxHeight: "100%", overflow: "auto"}}>
                     <MovelistDisplay displayList={ this.state.rootDisplayList } activeMove={ this.state.displayList } moveSelectionCallback={ this.moveSelectionCallback }/>
+                </Grid>
+                <Grid item xs={"auto"} style={{height: "100%", maxHeight: "100%", overflow: "auto"}}>
+                    { this.state.diffs.map(x => {
+                        return <ListItem key={ `${x}` }> <DiffDisplay diff={ x }/> </ListItem>
+                    }) }
                 </Grid>
             </Grid>
         );

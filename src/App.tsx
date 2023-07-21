@@ -3,7 +3,6 @@ import "./App.css";
 import { Grid } from "@mui/material";
 import Editor from "./Components/Editor/Editor";
 
-
 class App extends React.Component {
   constructor(props: Record<string, never>) {
     super(props);

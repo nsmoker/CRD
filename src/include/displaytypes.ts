@@ -13,3 +13,8 @@ export function finishLinking(mdl: MoveDisplayList) {
         element.prev = mdl
     });
 }
+
+export interface TreeDiff {
+    display_list: MoveDisplayList,
+    diffs: [MoveDisplayList, MoveDisplayList][]
+}

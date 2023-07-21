@@ -2,7 +2,7 @@ use std::{path::PathBuf, fs};
 
 use tauri::Window;
 
-use crate::{commands::parse_pgn_for_display, constants::{PGN_DISPLAY_CHANNEL, REPERTOIRES_LOCATION}, commands::position::PgnDisplay};
+use crate::{commands::parse_pgn_for_display, constants::{PGN_DISPLAY_CHANNEL, REPERTOIRES_LOCATION, PGN_COMPARE_CHANNEL}, commands::position::PgnDisplay};
 
 #[derive(serde::Serialize, Clone)]
 struct PgnDisplayInterchange {
@@ -10,6 +10,12 @@ struct PgnDisplayInterchange {
     comment: String,
     algebraic: String,
     next: Vec<PgnDisplayInterchange>
+}
+
+#[derive(serde::Serialize, Clone)]
+struct PgnCompareResult {
+    display_list: PgnDisplayInterchange,
+    diffs: Vec<(PgnDisplayInterchange, PgnDisplayInterchange)>
 }
 
 impl From<PgnDisplay> for PgnDisplayInterchange {
@@ -48,6 +54,56 @@ pub fn handle_rep_load(app: &Window, file: &str) {
     }
 }
 
-pub fn handle_save_pgn(app: &Window, file: Option<PathBuf>) {
-    todo!();
+pub fn tree_diff(rep: &PgnDisplay, other: &PgnDisplay) -> Vec<(PgnDisplay, PgnDisplay)> {
+    let has_next = rep.next.len() > 0 && other.next.len() > 0;
+    let mut ret = Vec::new();
+    if rep.fen == other.fen && (has_next && rep.next[0].fen != other.next[0].fen) {
+        ret.push((rep.clone(), other.clone()));
+    }
+
+    for node in &rep.next {
+        ret.append(&mut tree_diff(node, other));
+    }
+
+    for node in &other.next {
+        ret.append(&mut tree_diff(rep, node));
+    }
+
+    return ret;
+}
+
+pub fn handle_import_compare(app: &Window, file: Option<PathBuf>) {
+    if let Some(path) = file {
+        if let Ok(dir) = fs::read_dir(REPERTOIRES_LOCATION) {
+            let trees = dir.map(|rd| {
+                let st = rd.unwrap().file_name().to_str().unwrap().to_owned();
+                if let Ok(contents) = fs::read_to_string(format!("{}/{}", REPERTOIRES_LOCATION, st.clone())) {
+                    return Some(parse_pgn_for_display(&contents));
+                } else {
+                    return None;
+                }
+            });
+
+
+            if let Ok(contents) = fs::read_to_string(path.to_str().unwrap()) {
+                let mut diffs = Vec::new();
+                let pgn_for_display = parse_pgn_for_display(&contents);
+                for opt in trees {
+                    if let Some(tree) = opt {
+                        diffs.append(&mut tree_diff(&tree, &pgn_for_display));
+                    }
+                }
+                let res = PgnCompareResult {
+                    display_list: PgnDisplayInterchange::from(pgn_for_display),
+                    diffs: diffs.iter().map(|(x, y)| (PgnDisplayInterchange::from(x.clone()), PgnDisplayInterchange::from(y.clone()))).collect()
+                };
+
+                app.emit(PGN_COMPARE_CHANNEL, res).unwrap();
+                println!("diffs: {:?}", diffs.len());
+            }
+
+        }
+
+
+    }
 }

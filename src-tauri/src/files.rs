@@ -1,8 +1,8 @@
 use std::{path::PathBuf, fs};
 
-use tauri::{App, AppHandle, Window};
+use tauri::Window;
 
-use crate::{commands::parse_pgn_for_display, constants::PGN_DISPLAY_CHANNEL, commands::position::PgnDisplay};
+use crate::{commands::parse_pgn_for_display, constants::{PGN_DISPLAY_CHANNEL, REPERTOIRES_LOCATION}, commands::position::PgnDisplay};
 
 #[derive(serde::Serialize, Clone)]
 struct PgnDisplayInterchange {
@@ -32,4 +32,22 @@ pub fn handle_pgn_pick(app: &Window, picked: Option<PathBuf>) {
             app.emit(PGN_DISPLAY_CHANNEL, PgnDisplayInterchange::from(pgn_for_display)).unwrap();
         }
     }
+}
+
+pub fn handle_rep_add(picked: Option<PathBuf>) {
+    if let Some(file) = picked {
+        fs::create_dir(REPERTOIRES_LOCATION).unwrap_or(());
+        fs::copy(file.clone(), format!("{}/{}", REPERTOIRES_LOCATION, file.file_name().unwrap().to_str().unwrap())).unwrap_or(0);
+    }
+}
+
+pub fn handle_rep_load(app: &Window, file: &str) {
+    if let Ok(contents) = fs::read_to_string(format!("{}/{}", REPERTOIRES_LOCATION, file)) {
+        let pgn_for_display = parse_pgn_for_display(&contents);
+        app.emit(PGN_DISPLAY_CHANNEL, PgnDisplayInterchange::from(pgn_for_display)).unwrap();
+    }
+}
+
+pub fn handle_save_pgn(app: &Window, file: Option<PathBuf>) {
+    todo!();
 }

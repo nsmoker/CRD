@@ -23,3 +23,5 @@ fe-compiled
 *.sw?
 .vscode
 public
+
+src-tauri/repertoires

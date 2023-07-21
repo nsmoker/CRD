@@ -5,19 +5,30 @@ mod commands;
 mod constants;
 mod files;
 
-use std::fs;
 
-use commands::parse_pgn_for_display;
-use constants::PGN_IMPORT_MENU_ID;
-use tauri::{Menu, CustomMenuItem, Submenu, api::dialog::FileDialogBuilder, WindowBuilder};
+use std::fs::{self};
+
+use constants::{PGN_IMPORT_MENU_ID, ADD_REPERTOIRE_MENU_ID, REPERTOIRES_LOCATION, SAVE_AS_MENU_ID};
+use tauri::{Menu, CustomMenuItem, Submenu, api::dialog::FileDialogBuilder,};
 #[cfg(target_os = "windows")]
 use uds_windows::UnixStream;
-#[cfg(not(target_os = "windows"))]
-use tauri::Manager;
 
 fn main() {
+    let mut rep_load_menu = Menu::new();
+    let dir_read = fs::read_dir(REPERTOIRES_LOCATION);
+    if let Ok(dir) = dir_read {
+        for rd in dir {
+            if let Ok(rep) = rd {
+                rep_load_menu = rep_load_menu.add_item(CustomMenuItem::new(rep.file_name().to_str().unwrap(), rep.file_name().to_str().unwrap()));
+            }
+        }
+    }
+    let rep_load_submenu = Submenu::new("Load repertoire", rep_load_menu);
     let file_submenu = Submenu::new("File", Menu::new()
-    .add_item(CustomMenuItem::new(PGN_IMPORT_MENU_ID, "Import PGN file")));
+        .add_item(CustomMenuItem::new(PGN_IMPORT_MENU_ID, "Import PGN file"))
+        .add_item(CustomMenuItem::new(ADD_REPERTOIRE_MENU_ID, "Add Repertoire"))
+        .add_item(CustomMenuItem::new(SAVE_AS_MENU_ID, "Save as..."))
+        .add_submenu(rep_load_submenu));
     let menu = Menu::new()
         .add_submenu(file_submenu);
 
@@ -31,11 +42,26 @@ fn main() {
                         .add_filter("PGN Files", &["pgn"])
                         .pick_file(move |picked| files::handle_pgn_pick(event.window(), picked));
                 },
-                _ => todo!()
+                x if x == ADD_REPERTOIRE_MENU_ID => {
+                    FileDialogBuilder::new()
+                        .add_filter("PGN Files", &["pgn"])
+                        .pick_file(move |picked| files::handle_rep_add(picked));
+                },
+                x if x == SAVE_AS_MENU_ID => {
+                    FileDialogBuilder::new()
+                        .add_filter("PGN Files", &["pgn"])
+                        .save_file(move |file| {
+                            files::handle_save_pgn(event.window(), file);
+                        });
+                },
+                x => {
+                    if let Ok(mut dir) = fs::read_dir(REPERTOIRES_LOCATION) {
+                        if dir.any(|y| y.unwrap().file_name().to_str().unwrap() == x) {
+                            files::handle_rep_load(event.window(), x.into());
+                        }
+                    }
+                }
             }
-        })
-        .setup(|app| {
-            Ok(())
         })
         .invoke_handler(tauri::generate_handler![commands::check_legal])
         .run(tauri::generate_context!())

@@ -8,8 +8,9 @@ mod files;
 
 use std::fs::{self};
 
-use constants::{PGN_IMPORT_MENU_ID, ADD_REPERTOIRE_MENU_ID, REPERTOIRES_LOCATION, SAVE_AS_MENU_ID, IMPORT_COMPARE_MENU_ID};
-use tauri::{Menu, CustomMenuItem, Submenu, api::dialog::FileDialogBuilder,};
+use constants::{PGN_IMPORT_MENU_ID, ADD_REPERTOIRE_MENU_ID, REPERTOIRES_LOCATION, SAVE_AS_MENU_ID, IMPORT_COMPARE_MENU_ID, COPY_POSITION_FEN_MENU_ID, COPY_CURRENT_FEN_CHANNEL};
+use tauri::{Menu, CustomMenuItem, Submenu, api::dialog::FileDialogBuilder, Manager,};
+use tauri::ClipboardManager;
 #[cfg(target_os = "windows")]
 use uds_windows::UnixStream;
 
@@ -30,8 +31,11 @@ fn main() {
         .add_item(CustomMenuItem::new(SAVE_AS_MENU_ID, "Save as..."))
         .add_item(CustomMenuItem::new(IMPORT_COMPARE_MENU_ID, "Import and Compare"))
         .add_submenu(rep_load_submenu));
+    let edit_submenu = Submenu::new("Edit", Menu::new()
+        .add_item(CustomMenuItem::new(COPY_POSITION_FEN_MENU_ID, "Copy Position FEN")));
     let menu = Menu::new()
-        .add_submenu(file_submenu);
+        .add_submenu(file_submenu)
+        .add_submenu(edit_submenu);
 
 
     tauri::Builder::default()
@@ -48,17 +52,14 @@ fn main() {
                         .add_filter("PGN Files", &["pgn"])
                         .pick_file(move |picked| files::handle_rep_add(picked));
                 },
-                x if x == SAVE_AS_MENU_ID => {
-                    FileDialogBuilder::new()
-                        .add_filter("PGN Files", &["pgn"])
-                        .save_file(move |file| {
-                        });
-                },
                 x if x == IMPORT_COMPARE_MENU_ID => {
                     FileDialogBuilder::new()
                         .add_filter("PGN Files", &["pgn"])
                         .pick_file(move |picked| files::handle_import_compare(event.window(), picked));
                 },
+                x if x == COPY_POSITION_FEN_MENU_ID => {
+                    event.window().emit(COPY_CURRENT_FEN_CHANNEL, ()).unwrap();
+                }
                 x => {
                     if let Ok(mut dir) = fs::read_dir(REPERTOIRES_LOCATION) {
                         if dir.any(|y| y.unwrap().file_name().to_str().unwrap() == x) {

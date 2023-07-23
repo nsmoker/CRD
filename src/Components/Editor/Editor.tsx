@@ -1,9 +1,10 @@
 import React from "react";
 import { MoveDisplayList, TreeDiff, finishLinking } from "../../include/displaytypes";
-import { PGN_COMPARE_CHANNEL, PGN_DISPLAY_CHANNEL, STARTING_POSITION_FEN } from "../../include/constants";
+import { FEN_COPY_REQUEST_CHANNEL, PGN_COMPARE_CHANNEL, PGN_DISPLAY_CHANNEL, STARTING_POSITION_FEN } from "../../include/constants";
 import Chessboard from "../Chessboard/Chessboard";
 
 import { UnlistenFn, listen, Event } from "@tauri-apps/api/event"
+import { writeText, readText } from "@tauri-apps/api/clipboard"
 import { Grid, ListItem, Typography } from "@mui/material";
 import MovelistDisplay from "../MovelistDisplay/MovelistDisplay";
 import DiffDisplay from "../DiffDisplay/DiffDisplay";
@@ -40,6 +41,7 @@ class Editor extends React.Component<Record<string, never>, IState> {
             .then(unlisten => this.setState( { unlisteners: this.state.unlisteners.concat(unlisten) } ));
         listen<TreeDiff>(PGN_COMPARE_CHANNEL, this.handleCompare)
             .then(unlisten => this.setState( { unlisteners: this.state.unlisteners.concat(unlisten) } ));
+        listen(FEN_COPY_REQUEST_CHANNEL, this.handleFenCopy).then(ul => this.setState( { unlisteners: this.state.unlisteners.concat(ul) } ));
     }
 
     handleCompare = (event: Event<TreeDiff>) => {
@@ -51,6 +53,10 @@ class Editor extends React.Component<Record<string, never>, IState> {
     handleNewDisplayList = (newLst: Event<MoveDisplayList>) => {
         finishLinking(newLst.payload)
         this.setState( { rootDisplayList: newLst.payload, displayList: newLst.payload } );
+    }
+
+    handleFenCopy = () => {
+        writeText(this.state.displayList.fen).then(null, () => console.log("Failed to copy FEN string."));
     }
 
     moveCallback = (fen: string, algebraic: string) => {

@@ -11,3 +11,4 @@ pub static COPY_POSITION_FEN_MENU_ID: &str = "pos_fen_copy";
 pub static PGN_DISPLAY_CHANNEL: &str = "pgn_emit";
 pub static PGN_COMPARE_CHANNEL: &str = "pgn_compare";
 pub static COPY_CURRENT_FEN_CHANNEL: &str = "copy_fen";
+pub static EVAL_UPDATE_CHANNEL: &str = "eval_update";

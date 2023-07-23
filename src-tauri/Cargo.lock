@@ -285,6 +285,7 @@ dependencies = [
  "prost",
  "prost-build",
  "prost-types",
+ "regex",
  "serde",
  "serde_json",
  "tauri",

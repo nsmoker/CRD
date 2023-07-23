@@ -1,9 +1,9 @@
 
-use std::{os::unix::net::UnixStream, io::{Write, Read, Cursor}};
+use std::{os::unix::net::UnixStream, io::{Write, Read, Cursor}, sync::Mutex};
 
 use prost::Message;
 
-use crate::constants::{CHECK_LEGAL_SOCKET_LOCATION, PARSE_PGN_SOCKET_LOCATION};
+use crate::{constants::{CHECK_LEGAL_SOCKET_LOCATION, PARSE_PGN_SOCKET_LOCATION}, uci};
 
 use self::position::{MoveInPosition, MoveMessage, Coordinate, Position, MoveLegal, RequestPgnParse, PgnDisplay};
 
@@ -104,4 +104,10 @@ pub fn parse_pgn_for_display(pgn: &str) -> PgnDisplay {
     let ser = serialize_pgn_request(request);
     let response = write_and_get_response(&ser, PARSE_PGN_SOCKET_LOCATION);
     return deserialize_pgn_display(&response);
+}
+
+#[tauri::command]
+pub fn submit_position_for_eval(fen: &str, state: tauri::State<Mutex<uci::UciContext> >) {
+    println!("{}", fen);
+    state.lock().unwrap().eval_position(fen.to_owned());
 }

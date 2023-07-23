@@ -1,4 +1,4 @@
-use std::{path::PathBuf, fs, collections::HashSet};
+use std::{path::PathBuf, fs};
 
 use tauri::Window;
 

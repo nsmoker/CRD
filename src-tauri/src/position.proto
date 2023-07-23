@@ -36,7 +36,8 @@ message PgnDisplay {
     string fen = 1;
     string comment = 2;
     string algebraic = 3;
-    repeated PgnDisplay next = 4;
+    bool whitesTurn = 4;
+    repeated PgnDisplay next = 5;
 }
 
 option go_package = "gochess/";

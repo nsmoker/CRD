@@ -4,12 +4,12 @@
 mod commands;
 mod constants;
 mod files;
+mod uci;
 
-
-use std::fs::{self};
+use std::{fs::{self}, sync::Mutex};
 
 use constants::{PGN_IMPORT_MENU_ID, ADD_REPERTOIRE_MENU_ID, REPERTOIRES_LOCATION, SAVE_AS_MENU_ID, IMPORT_COMPARE_MENU_ID, COPY_POSITION_FEN_MENU_ID, COPY_CURRENT_FEN_CHANNEL};
-use tauri::{Menu, CustomMenuItem, Submenu, api::dialog::FileDialogBuilder,};
+use tauri::{Menu, CustomMenuItem, Submenu, api::dialog::FileDialogBuilder, Manager,};
 #[cfg(target_os = "windows")]
 use uds_windows::UnixStream;
 
@@ -36,8 +36,15 @@ fn main() {
         .add_submenu(file_submenu)
         .add_submenu(edit_submenu);
 
+    let mut uci_context = uci::UciContext::new().unwrap();
+
 
     tauri::Builder::default()
+        .setup(|app| {
+            uci_context.init(app.handle());
+            app.manage(Mutex::new(uci_context));
+            Ok(())
+        })
         .menu(menu)
         .on_menu_event(|event| {
             match event.menu_item_id() {
@@ -68,7 +75,7 @@ fn main() {
                 }
             }
         })
-        .invoke_handler(tauri::generate_handler![commands::check_legal])
+        .invoke_handler(tauri::generate_handler![commands::check_legal, commands::submit_position_for_eval])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

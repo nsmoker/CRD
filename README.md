@@ -19,8 +19,9 @@ I've only tested this app on Linux. It should run on MacOS without issue. Window
 
 1. `git clone git@github.com:nsmoker/CRD.git`
 2. `git clone git@github.com:nsmoker/gochess.git`
-3. `go run gochess/main.go`
-4. `cd CRD`
-5. `npm install`
-6. `npm run tauri dev`
+3. `cd gochess`
+4. `make run`
+6. In another terminal... `cd CRD`
+7. `npm install`
+8. `npm run tauri dev`
 Should get you up and running. 

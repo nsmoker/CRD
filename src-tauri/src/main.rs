@@ -9,8 +9,7 @@ mod files;
 use std::fs::{self};
 
 use constants::{PGN_IMPORT_MENU_ID, ADD_REPERTOIRE_MENU_ID, REPERTOIRES_LOCATION, SAVE_AS_MENU_ID, IMPORT_COMPARE_MENU_ID, COPY_POSITION_FEN_MENU_ID, COPY_CURRENT_FEN_CHANNEL};
-use tauri::{Menu, CustomMenuItem, Submenu, api::dialog::FileDialogBuilder, Manager,};
-use tauri::ClipboardManager;
+use tauri::{Menu, CustomMenuItem, Submenu, api::dialog::FileDialogBuilder,};
 #[cfg(target_os = "windows")]
 use uds_windows::UnixStream;
 

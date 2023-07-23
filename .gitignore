@@ -25,3 +25,5 @@ fe-compiled
 public
 
 src-tauri/repertoires
+
+bin

@@ -1,4 +1,4 @@
-use std::{path::PathBuf, fs};
+use std::{path::PathBuf, fs, collections::HashSet};
 
 use tauri::Window;
 
@@ -54,21 +54,32 @@ pub fn handle_rep_load(app: &Window, file: &str) {
     }
 }
 
-pub fn tree_diff(rep: &PgnDisplay, other: &PgnDisplay) -> Vec<(PgnDisplay, PgnDisplay)> {
-    let has_next = rep.next.len() > 0 && other.next.len() > 0;
+pub fn collect_fens(in_tree: &PgnDisplay) -> Vec<PgnDisplay> {
     let mut ret = Vec::new();
-    if rep.fen == other.fen && (has_next && rep.next[0].fen != other.next[0].fen) {
-        ret.push((rep.clone(), other.clone()));
+    ret.push(in_tree.clone());
+    for x in in_tree.next.iter() {
+        ret.append(&mut collect_fens(x));
     }
 
-    for node in &rep.next {
-        ret.append(&mut tree_diff(node, other));
+    return ret;
+}
+
+pub fn tree_diff(rep: &PgnDisplay, other: &PgnDisplay) -> Vec<(PgnDisplay, PgnDisplay)> {
+    let rep_pos = collect_fens(rep);
+    let other_pos = collect_fens(other);
+    let mut ret = Vec::new();
+    for pos in other_pos {
+        for rpos in &rep_pos {
+            if pos.fen == rpos.fen {
+                if !pos.next.is_empty() && !rpos.next.is_empty() && pos.next[0].fen != rpos.next[0].fen {
+                    ret.push((rpos.clone(), pos.clone()));
+                }
+            }
+        }
     }
 
-    for node in &other.next {
-        ret.append(&mut tree_diff(rep, node));
-    }
-
+    ret.sort_unstable_by_key(|x| (x.clone().0.fen, x.clone().1.fen));
+    ret.dedup_by_key(|x| (x.clone().0.fen, x.clone().1.fen));
     return ret;
 }
 

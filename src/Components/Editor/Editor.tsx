@@ -104,7 +104,7 @@ class Editor extends React.Component<Record<string, never>, IState> {
                 </Grid>
                 <Grid item xs={"auto"} style={{height: "100%", maxHeight: "100%", overflow: "auto"}}>
                     { this.state.diffs.map(x => {
-                        return <ListItem key={ `${x}` }> <DiffDisplay diff={ x }/> </ListItem>
+                        return <ListItem key={ `${x[0].fen} ${x[1].fen}` }> <DiffDisplay diff={ x }/> </ListItem>
                     }) }
                 </Grid>
             </Grid>

@@ -14,9 +14,9 @@ class DiffDisplay extends React.Component<IProps, Record<string, never> > {
 
     render() {
         return (
-            <Paper>
-                <Typography>Should have played {this.props.diff[0].next[0].algebraic}</Typography>
-                <Typography>But played {this.props.diff[1].next[0].algebraic}</Typography>
+            <Paper className="diff-display">
+                <Typography>Should play {this.props.diff[0].next[0].algebraic}</Typography>
+                <Typography>But played  {this.props.diff[1].next.length == 0 ? "Nothing" : this.props.diff[1].next[0].algebraic}</Typography>
             </Paper>
         );
     }

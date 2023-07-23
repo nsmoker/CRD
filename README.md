@@ -4,14 +4,14 @@ This is a small app I've been working on to let you specify a chess repertoire, 
 
 1. Display PGN files with variations.
 2. Allow you to interactively make moves and play.
-3. Allow you to import a repertoire.
-4. Allow you to import a game and see a "diff" view that shows you where you went wrong.
+3. Show you Stockfish evals.
+4. Allow you to import a repertoire.
+5. Allow you to import a game and see a "diff" view that shows you where you went wrong.
 
 Things this doesn't do yet but that I am actively in the process of adding:
 1. Export PGN files.
-2. Show Stockfish evals (this was done in a previous version but there was a VCS mishap).
-3. Show comments in PGN/let you edit them.
-4. Modify repertoires in app (this goes along with exporting PGN).
+2. Show comments in PGN/let you edit them.
+3. Modify repertoires in app (this goes along with exporting PGN).
 
 # How to run
 
@@ -24,6 +24,6 @@ from a fresh clone is janky.
 4. `make run`
 6. In another terminal... `cd CRD`
 7. Grab a Stockfish binary, rename it "stockfish", and put it in a directory called bin at the root of the repository.
-7. `npm install`
-8. `npm run tauri dev`
+8. `npm install`
+9. `npm run tauri dev`
 Should get you up and running. 

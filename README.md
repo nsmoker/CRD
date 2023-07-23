@@ -15,13 +15,15 @@ Things this doesn't do yet but that I am actively in the process of adding:
 
 # How to run
 
-I've only tested this app on Linux. It should run on MacOS without issue. Windows 10 should run with minimal changes. Currently, the only barrier to cross-platform is the location of various Unix streams, which matters because the app itself is just a dumb frontend that talks to my Go chess library.
+I've only tested this app on Linux. It should run on MacOS without issue. Windows 10 should run with minimal changes. Currently, the only barrier to cross-platform is the location of various Unix streams, which matters because the app itself is just a dumb frontend that talks to my Go chess library. The app is currently only set up for ease of iteration, so running it
+from a fresh clone is janky. 
 
 1. `git clone git@github.com:nsmoker/CRD.git`
 2. `git clone git@github.com:nsmoker/gochess.git`
 3. `cd gochess`
 4. `make run`
 6. In another terminal... `cd CRD`
+7. Grab a Stockfish binary, rename it "stockfish", and put it in a directory called bin at the root of the repository.
 7. `npm install`
 8. `npm run tauri dev`
 Should get you up and running. 

@@ -25,7 +25,7 @@ class Editor extends React.Component<Record<string, never>, IState> {
         const dpl = {
             fen: STARTING_POSITION_FEN,
             algebraic: "",
-            comment: "",
+            comment: [],
             whitesTurn: true,
             prev: null,
             next: []
@@ -76,7 +76,7 @@ class Editor extends React.Component<Record<string, never>, IState> {
         const newMdl = {
             fen: fen,
             algebraic: algebraic,
-            comment: "",
+            comment: [],
             whitesTurn: !this.state.displayList.whitesTurn,
             prev: this.state.displayList,
             next: []
@@ -100,8 +100,10 @@ class Editor extends React.Component<Record<string, never>, IState> {
 
     keypressCallback = (event: React.KeyboardEvent) => {
         if (event.key === "ArrowLeft" && this.state.displayList.prev != null) {
+            invoke(EVAL_POSITION_COMMAND, { fen: this.state.displayList.prev.fen } );
             this.setState( { displayList: this.state.displayList.prev } );
         } else if (event.key === "ArrowRight" && this.state.displayList.next.length > 0) {
+            invoke(EVAL_POSITION_COMMAND, { fen: this.state.displayList.next[0].fen } );
             this.setState( { displayList: this.state.displayList.next[0] } );
         }
     }

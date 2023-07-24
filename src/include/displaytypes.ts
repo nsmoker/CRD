@@ -1,7 +1,7 @@
 export interface MoveDisplayList {
     fen: string,
     algebraic: string,
-    comment: string,
+    comment: string[],
     whitesTurn: boolean,
     prev: MoveDisplayList | null,
     next: MoveDisplayList[]

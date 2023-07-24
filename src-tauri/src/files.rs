@@ -7,7 +7,7 @@ use crate::{commands::parse_pgn_for_display, constants::{PGN_DISPLAY_CHANNEL, RE
 #[derive(serde::Serialize, Clone)]
 struct PgnDisplayInterchange {
     fen: String,
-    comment: String,
+    comment: Vec<String>,
     algebraic: String,
     next: Vec<PgnDisplayInterchange>
 }

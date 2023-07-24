@@ -45,6 +45,12 @@ class MovelistDisplay extends React.Component<IProps, Record<string, never> > {
             }
 
             ret.push(chip);
+
+            for (let i = 0; i < elem.comment.length; ++i) {
+                const comment = elem.comment[i]
+                ret.push(<Typography key={ `${ply} ${elem.fen} ${elem.algebraic} ${index} cmt${i}` } className="comment">{ comment }</Typography>)
+            }
+
             ret = ret.concat(this.generateMoveDisplay(elem, ply + 1, inVariation || index !== 0));
             if (index !== 0) {
                 ret.push(<Typography key={ `${ply} ${elem.fen} ${index} var-end` }>)</Typography>)

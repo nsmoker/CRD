@@ -1,4 +1,4 @@
-use std::{process::{Child, Command, Stdio, ChildStdin, Output}, thread::{self, JoinHandle}, io::{Write, BufRead, BufReader}};
+use std::{process::{Child, Command, Stdio, ChildStdin}, thread::{self, JoinHandle}, io::{Write, BufRead, BufReader}};
 
 use regex::Regex;
 use tauri::AppHandle;
@@ -44,15 +44,12 @@ impl UciContext {
                 if let Ok(0) = br.read_line(&mut buf) {
                     break;
                 } else {
-                    println!("{}", buf);
                     if cp_re.is_match(&buf) {
                         app.emit_all(EVAL_UPDATE_CHANNEL, cp_re.captures(&buf).unwrap()["centipawns"].parse::<i32>().unwrap()).unwrap();
                     }
                     buf.clear();
                 }
             }
-
-            println!("after loop");
         });
 
         self.poll_thread = Some(poll_thread);
@@ -62,10 +59,5 @@ impl UciContext {
         self.in_pipe.write_all(b"stop\r\n").unwrap_or(());
         self.in_pipe.write_all(format!("position fen {}\r\n", position_fen).as_bytes()).unwrap_or(());
         self.in_pipe.write_all(b"go depth 25\r\n").unwrap_or(());
-    }
-
-    pub fn cleanup(&mut self) {
-        self.engine_proc.kill().unwrap();
-        self.engine_proc.wait().unwrap();
     }
 }
